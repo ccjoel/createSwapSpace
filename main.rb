@@ -215,11 +215,10 @@ if swapCachePressure.to_i != 50
 	checkSuccess
 
 
-# Verify that the pressure is not set in /etc/sysctl.conf
-  isCachePressureAddedToSysCtl = `cat /etc/sysctl.conf | grep vm.vfs_cache_pressure | grep -v "#" | wc -l`
-# vm.vfs_cache_pressure?
+	# Verify that the pressure is not set in /etc/sysctl.conf
+	isCachePressureAddedToSysCtl = `cat /etc/sysctl.conf | grep vm.vfs_cache_pressure | grep -v "#" | wc -l`
 
-# If it isn't set:
+	# If it isn't set:
 	if isCachePressureAddedToSysCtl.to_i = 0
 		# vm.vfs_cache_pressure = 50 # in that file
 		appendToFile '/etc/sysctl.conf' 'vm.vfs_cache_pressure=50'
