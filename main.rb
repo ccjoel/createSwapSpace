@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 
 require 'sys/filesystem'
 
@@ -10,6 +10,14 @@ require 'sys/filesystem'
 # Author: Joel Quiles
 
 puts "Testing script"
+
+def checkSuccess()
+  if `echo $?` != 0
+		puts "Error in running last command. Aborting script."
+	end
+end
+
+puts `echo $LINENO`
 
 totalLinesForSwap = `sudo swapon -s | wc -l`              # swapon shows total swap space allocated
 # If swapon output is just one line, there is not swap space being used
@@ -45,6 +53,7 @@ else
 	#exit 3
 end
 
+checkSuccess
 
 # TODO: allocate swap space
 
