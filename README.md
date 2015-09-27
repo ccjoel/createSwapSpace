@@ -8,7 +8,7 @@ Please, run with sudo: (needs sudo/root for a lot of operations, writing in some
 sudo ruby main.rb
 ```
 
-Ps. Don't worry about not finding gems for not running as root, I didn't use any...
+Ps. Don't worry about not finding gems since we are running as root, I didn't use any... :-)
 
 # Important:
 
