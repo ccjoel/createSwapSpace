@@ -195,16 +195,28 @@ end
 
 
 
-# TODO: verify the swap cache pressue
-# cat /proc/sys/vm/vfs_cache_pressure... is it 100? 50? should be 50...
+# Verify the swap cache pressure
+swapCachePressure = `cat /proc/sys/vm/vfs_cache_pressure` # ... is it 100? 50? should be 50...
 
-# TODO: if cache pressure is not 50, set to 50:
+# If cache pressure is not 50, set to 50:
 
-#  sysctl vm.vfs_cache_pressure=50
+if swapCachePressure.to_i != 50
 
-# TODO: verify that the pressure is not set in /etc/sysctl.conf
+	`sysctl vm.vfs_cache_pressure=50`
+	checkSuccess
+
+
+# Verify that the pressure is not set in /etc/sysctl.conf
+  isCachePressureAddedToSysCtl = `cat /etc/sysctl.conf | grep vm.vfs_cache_pressure | grep -v "#" | wc -l`
 # vm.vfs_cache_pressure?
 
-# TODO: if it isnt' set:
+# If it isn't set:
+	if isCachePressureAddedToSysCtl.to_i = 0
+		# vm.vfs_cache_pressure = 50 # in that file
+		appendToFile '/etc/sysctl.conf' 'vm.vfs_cache_pressure=50'
+	end
 
-# vm.vfs_cache_pressure = 50 # in that file
+end
+
+# We are DONE!
+return exit 0
