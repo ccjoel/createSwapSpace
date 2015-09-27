@@ -171,18 +171,29 @@ checkSuccess
 # -------------------- STEP [6] Tweak your Swap Settings -----------------------
 
 
-# Verify swapiness of swap space (on kernel)
-swapiness = `cat /proc/sys/vm/swappiness`
+# Verify swappiness of swap space (on kernel)
+swappiness = `cat /proc/sys/vm/swappiness`
 
-# If swapiness is not 10, set swapiness of system:
+puts "Current system swappiness: #{swappiness}"
 
-#  sysctl vm.swappiness=10
+if swapiness.to_i != 10        # If swapiness is not 10, set swapiness of system
+	puts "Updating swappiness of system to 10"
 
-# TODO: check that this variable `vm.swappiness` is not set in `/etc/sysctl.conf` file
+	`sysctl vm.swappiness=10`
+	checkSuccess
 
-# TODO: Add the swappines to /etc/sysctl.conf to make swapiness permanent on next boot
+# Check that this variable `vm.swappiness` is not set in `/etc/sysctl.conf` file
+	isSwappinessAddedToSysCtl = `cat /etc/sysctl.conf | grep vm.swappiness | grep -v "#" | wc -l`
 
-# vm.swappiness=10
+	if isSwappinessAddedToSysCtl.to_i = 0
+  	# Add the swappines to /etc/sysctl.conf to make swapiness permanent on next boot
+		appendToFile '/etc/sysctl.conf' 'vm.swappiness=10'
+		# TODO: else, if it exists, but with wrong value...?
+  end
+
+end
+
+
 
 # TODO: verify the swap cache pressue
 # cat /proc/sys/vm/vfs_cache_pressure... is it 100? 50? should be 50...
