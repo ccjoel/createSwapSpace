@@ -73,7 +73,7 @@ puts "Total swap: #{totalSwap}"
 
 
 
-#-------- STEP [2] : Check Available Space on the Hard Drive Partition ---------
+#------- STEP [2] : Check Available Space on the Hard Drive / Partition --------
 
 
 puts "Let's verify that there is enough space on drive to add swap space."
