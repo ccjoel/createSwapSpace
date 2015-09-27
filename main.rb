@@ -9,11 +9,10 @@
 # version: 0.5
 
 
-# ---------------------------------- Imports -----------------------------------
-require 'sys/filesystem'
 
 
-puts "Swap creation script."
+
+puts "Swap creation script.\n"
 
 
 # ---------------------------- GLOBAL HELPER FUNS ------------------------------
@@ -79,12 +78,22 @@ puts "Total swap: #{totalSwap}"
 
 puts "Let's verify that there is enough space on drive to add swap space."
 
-stat = Sys::Filesystem.stat("/")
-gb_available = stat.block_size * stat.blocks_available / 1024 / 1024 / 1024
 
-puts gb_available.to_s + "G"
+gb_available = `df -h | grep /dev/sda`
+checkSuccess
 
-if gb_available > 10
+linesAvailableForDiskSpace = `df -h | grep /dev/sda | wc -l`
+checkSuccess
+
+if linesAvailableForDiskSpace != 1
+	errorExit 7
+end
+
+gb_available = gb_available.split(" ")[3]
+
+puts " GB Available on system: #{gb_available}"
+
+if gb_available.to_i > 10
 	puts "Enough disk space available to allocate 4G of swap space"
 else
 	puts "Less than 10G available, won't allocate swap space."
