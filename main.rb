@@ -1,16 +1,22 @@
 #!/usr/bin/env ruby
 
+
+
+
+# ------------------------------ Add swap script -------------------------------
+# Author: Joel Quiles
+# Dependencies: Ruby 1.9.x
+
+
+
+# ---------------------------------- Imports -----------------------------------
 require 'sys/filesystem'
 
-#Dependencies: Ruby 1.9.x
 
-# Add swap script
+puts "Swap creation script."
 
 
-# Author: Joel Quiles
-
-puts "Testing script"
-
+# ---------------------------- GLOBAL HELPER FUNS ------------------------------
 def checkSuccess
 	result = $?
   if result.exitstatus != 0
@@ -24,6 +30,11 @@ def errorExit(exitCode)
 	return nil # for now
 	return exit exitCode
 end
+
+
+
+# -------------------------------- START SCRIPT --------------------------------
+
 
 totalLinesForSwap = `swapon -s | wc -l`              # swapon shows total swap space allocated
 # If swapon output is just one line, there is not swap space being used
@@ -49,6 +60,8 @@ if swapWord != "Swap:"
 	puts "Free output in an unexpeted format"
 	errorExit 2
 end
+
+puts "Total swap: #{totalSwap}"
 
 puts "Let's verify that there is enough space on drive to add swap space"
 
@@ -84,12 +97,27 @@ checkSuccess
 
 checkSuccess
 
-# TODO: Verify that swapon's new output contains the right swap params
-#  `swapon -s`
+# Verify that swapon's new output contains the right swap params
+
+totalLinesForSwap = `swapon -s | wc -l`              # swapon shows total swap space allocated
+# If swapon output is just one line, there is not swap space being used
+puts "Current lines from swapon -s, after swap creation: #{totalLinesForSwap}"
+
+if totalLinesForSwap.to_i != 1
+	errorExit 4
+end
 
 # TODO: double check free to see that there is actually swap here
+output = `free -m`
 
-# free -m
+checkSuccess
+
+totalSwap = output.split(" ")[18]
+puts "Total swap: #{totalSwap}"
+
+if totalSwap.to_i == 0
+	errorExit 5
+end
 
 # TODO: Make the Swap File Permanent
 
