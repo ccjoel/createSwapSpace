@@ -27,10 +27,14 @@ def checkSuccess
 end
 
 def errorExit(exitCode)
-	return nil # for now
 	return exit exitCode
 end
 
+def appendToFile(fileNameWithPath, stringToAppend)
+	File.open(fileNameWithPath, 'a') do |file|         # 'a' for append mode
+	  file.puts stringToAppend
+	end
+end
 
 
 # -------------------------------- START SCRIPT --------------------------------
@@ -40,8 +44,10 @@ end
 
 # ---------------- STEP [1] : Check the System for Swap Information ------------
 
+
 totalLinesForSwap = `swapon -s | wc -l` # swapon shows total swap space allocated
 					# If swapon output is just one line, there is not swap space being used
+
 puts "Current lines on swapon file: #{totalLinesForSwap}"
 
 if totalLinesForSwap.to_i > 1 or File.directory?("/swapfile")
@@ -70,6 +76,7 @@ puts "Total swap: #{totalSwap}"
 
 #-------- STEP [2] : Check Available Space on the Hard Drive Partition ---------
 
+
 puts "Let's verify that there is enough space on drive to add swap space."
 
 stat = Sys::Filesystem.stat("/")
@@ -91,8 +98,9 @@ checkSuccess
 
 # --------------------- STEP [3] : Create a Swap File --------------------------
 
+
 # Create file for allocate swap space
-# `fallocate -l 4G /swapfile`
+`fallocate -l 4G /swapfile`
 checkSuccess
 
 
@@ -103,14 +111,14 @@ checkSuccess
 
 
 # Add correct rights to swap file
-# `chmod 600 /swapfile`
+`chmod 600 /swapfile`
 
 # Tell system this newly allocated should be of type swap
-#  `mkswap /swapfile`
+`mkswap /swapfile`
 checkSuccess
 
 # Actually tell environment to use is swap!
-#  `swapon /swapfile`
+`swapon /swapfile`
 checkSuccess
 
 # Verify that swapon's new output contains the right swap params
@@ -141,15 +149,32 @@ end
 
 # ------------------- STEP [5] Make the Swap File Permanent --------------------
 
+
+# Check that there's no swap allocated into fstab:
+
+linesWithPermanentSwap = `cat /etc/fstab | grep swap | grep -v '#' | wc -l`
+
+if linesWithPermanentSwap > 0
+	errorExit 6
+end
+
 # Append the following line:
 # /swapfile   none    swap    sw    0   0
 # to this file: /etc/fstab
+appendToFile '/etc/fstab' '/swapfile   none    swap    sw    0   0'
+checkSuccess
 
-# TODO: verify swapiness of swap space (on kernel)
 
-# cat /proc/sys/vm/swappiness
 
-# TODO: set swapiness of system
+
+
+# -------------------- STEP [6] Tweak your Swap Settings -----------------------
+
+
+# Verify swapiness of swap space (on kernel)
+swapiness = `cat /proc/sys/vm/swappiness`
+
+# If swapiness is not 10, set swapiness of system:
 
 #  sysctl vm.swappiness=10
 
