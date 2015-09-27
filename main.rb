@@ -194,7 +194,7 @@ if swapiness.to_i != 10        # If swapiness is not 10, set swapiness of system
 # Check that this variable `vm.swappiness` is not set in `/etc/sysctl.conf` file
 	isSwappinessAddedToSysCtl = `cat /etc/sysctl.conf | grep vm.swappiness | grep -v "#" | wc -l`
 
-	if isSwappinessAddedToSysCtl.to_i = 0
+	if isSwappinessAddedToSysCtl.to_i == 0
   	# Add the swappines to /etc/sysctl.conf to make swapiness permanent on next boot
 		appendToFile '/etc/sysctl.conf' 'vm.swappiness=10'
 		# TODO: else, if it exists, but with wrong value...?
@@ -219,7 +219,7 @@ if swapCachePressure.to_i != 50
 	isCachePressureAddedToSysCtl = `cat /etc/sysctl.conf | grep vm.vfs_cache_pressure | grep -v "#" | wc -l`
 
 	# If it isn't set:
-	if isCachePressureAddedToSysCtl.to_i = 0
+	if isCachePressureAddedToSysCtl.to_i == 0
 		# vm.vfs_cache_pressure = 50 # in that file
 		appendToFile '/etc/sysctl.conf' 'vm.vfs_cache_pressure=50'
 	end
